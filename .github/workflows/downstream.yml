@@ -1,6 +1,11 @@
 name: Run Downstream tests
 
-on: push
+on:
+  push:
+  # Run weekly on Monday at 1:23 UTC
+  schedule:
+  - cron:  '23 1 * * 1'
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -17,17 +22,17 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest]
-        python-version: ['3.13']
+        python-version: ["3.13"]
         include:
-        - os: macos-14
-          python-version: '3.13'
+          - os: macos-14
+            python-version: "3.13"
 
     steps:
-    - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+    - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
       with:
         persist-credentials: false
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7
+      uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6
       with:
         python-version: ${{ matrix.python-version }}
     - name: Update Python installer
@@ -53,7 +58,7 @@ jobs:
         pytest
     - name: Install sagemath-repl
       run: |
-        # Sept 2024, sage has been failing for a while,
+        # Sept 2024, sage has been failing for a while, 
         # Skipping.
         # cd ..
         # git clone --depth 1 https://github.com/sagemath/sage
@@ -84,4 +89,5 @@ jobs:
     - name: Test pyflyby (IPython integration only)
       run: |
         cd ../pyflyby
-        pytest tests/test_interactive.py --deselect tests/test_interactive.py::test_debug_namespace_1_py3[prompt_toolkit] --deselect tests/test_interactive.py::test_run_separate_script_namespace_2 --deselect tests/test_interactive.py::test_autoimport_multiline_continued_statement_fake_1 --deselect tests/test_interactive.py::test_debug_second_1 --deselect tests/test_interactive.py::test_error_during_completion_1
+        pytest tests/test_interactive.py --deselect tests/test_interactive.py::test_debug_namespace_1_py3[prompt_toolkit] --deselect tests/test_interactive.py::test_run_separate_script_namespace_2
+        
